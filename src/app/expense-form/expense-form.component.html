@@ -1,0 +1,97 @@
+<h5 id="form-title">{{formTitle}}</h5>
+<form #expenseForm="ngForm" class="form-class" (ngSubmit)="onSubmit()">
+    <div class="form-group row" [ngClass]="{
+        'has-danger mb0': id.invalid && (id.dirty || id.touched),
+        'has-success': id.valid && (id.dirty || id.touched)}">
+      <label for="inputId" class="col-form-label col-form-label-sm col-sm-3">Id</label>
+      <div class="col-sm-9">
+        <input type="number" class="form-control form-control-sm" id="inputId" placeholder="Enter your id" name="id" [(ngModel)]="expenseItem.id" required pattern="[0-9]*" #id="ngModel">
+      </div>
+      <div class="col-sm-9 form-control-feedback" *ngIf="id.errors && (id.dirty || id.touched)">
+        <p *ngIf="id.errors.required">Id is required</p>
+		<p *ngIf="id.errors.pattern">Enter only positive whole numbers</p>
+      </div>
+    </div>  
+    <div class="form-group row" [ngClass]="{
+        'has-danger mb0': name.invalid && (name.dirty || name.touched),
+        'has-success': name.valid && (name.dirty || name.touched)}">
+      <label for="inputName" class="col-sm-3 col-form-label col-form-label-sm">Name</label>
+      <div class="col-sm-9">
+        <input type="text" class="form-control form-control-sm" id="inputName" placeholder="Enter your name" name="name" [(ngModel)]="expenseItem.name" minlength="2" required #name="ngModel">
+      </div>
+      <div class="col-sm-9 form-control-feedback" *ngIf="name.errors && (name.dirty || name.touched)">
+        <p *ngIf="name.errors.required">Item name is required</p>
+		<p *ngIf="name.errors.minlength">Item name must be 2 characters long</p>
+      </div>
+    </div>
+    <div class="form-group row">
+      <label for="inputDescription" class="col-sm-3 col-form-label col-form-label-sm">Description</label>
+      <div class="col-sm-9">
+        <input type="text" class="form-control form-control-sm" id="inputDescription" placeholder="Enter item description" name="description" [(ngModel)]="expenseItem.description">
+      </div>
+    </div>
+    <div class="form-group row" [ngClass]="{
+        'has-danger mb0': category.invalid && (category.dirty || category.touched),
+        'has-success': category.valid && (category.dirty || category.touched)}">
+      <label for="inputExpenseType" class="col-sm-3 col-form-label col-form-label-sm">Type</label>
+      <div class="col-sm-9">
+        <select class="form-control form-control-sm" name="expenseType" [(ngModel)]="expenseItem.expenseType" required #category="ngModel">
+          <option value="" disabled>Select expense type</option>
+          <!-- <option *ngFor="let type of keys(expenseTypes)" [ngValue]="expenseTypes[type]">{{type}}</option>  -->
+          <option *ngFor="let key of keys" [value]="key" [label]="expenseTypes[key]"></option>
+        </select>
+      </div>
+      <div class="col-sm-9 form-control-feedback error-display" *ngIf="category.errors && (category.dirty || category.touched)">
+        <p *ngIf="category.errors.required">Expense type is required</p>
+      </div>
+    </div>
+    <div class="form-group row" [ngClass]="{
+        'has-danger mb0': date.invalid && (date.dirty || date.touched),
+        'has-success': date.valid && (date.dirty || date.touched)}">
+      <label for="inputDate" class="col-sm-3 col-form-label col-form-label-sm">Date</label>
+      <div class="col-sm-9">
+        <input type="date" class="form-control form-control-sm" id="inputDate" placeholder="Choose date" name="expenseDate" [(ngModel)]="expenseItem.expenseDate" #date="ngModel" [max]="getToday()" onkeydown="return false" required>
+      </div>
+      <div class="col-sm-9 form-control-feedback error-display" *ngIf="date.errors && (date.dirty || date.touched)">
+        <p *ngIf="date.errors.required">Expense date is required</p>
+      </div>
+    </div>
+    <div class="form-group row" [ngClass]="{
+        'has-danger mb0': amount.invalid && (amount.dirty || amount.touched),
+        'has-success': amount.valid && (amount.dirty || amount.touched)}">
+      <label for="inputAmount" class="col-sm-3 col-form-label col-form-label-sm">Amount</label>
+      <div class="col-sm-9">
+        <input type="number" class="form-control form-control-sm" id="inputAmount" name="value" [(ngModel)]="expenseItem.value" required #amount="ngModel">
+      </div>
+      <div class="col-sm-9 form-control-feedback" *ngIf="amount.errors && (amount.dirty || amount.touched)">
+        <p *ngIf="amount.errors.required">Amount is required</p>
+      </div>
+    </div>
+    <div class="btn-wrapper">
+      <button type="submit" class="btn btn-primary btn-sm" [disabled]="expenseForm.invalid">Submit</button>
+    </div>
+  </form>
+ <table class="table" *ngIf="expenseItems | async">
+  <thead>
+    <tr>
+      <th>ItemId</th>
+      <th>ItemName</th>
+      <th>Description</th>
+      <th>Category</th>
+      <th>ExpenseDate</th>
+      <th>Amount</th>
+      <th>Action Item</th>
+    </tr>
+  </thead>
+  <tbody *ngFor="let item of expenseItems | async; let i = index">
+    <tr>
+      <td>{{ item?.id }}</td>
+      <td>{{ item?.name}}</td>
+      <td>{{ item?.description || "-"}}</td>
+      <td>{{ item? (expenseTypes[item.expenseType]) : ""}}</td>
+      <td>{{ item?.expenseDate}}</td>
+      <td>£{{ item?.value}}</td>
+      <td><button type="submit" class="btn btn-primary btn-sm" (click)="onDeleteItem(i)">Delete</button></td>
+    </tr>
+  </tbody>
+</table>

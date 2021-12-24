@@ -8,4 +8,7 @@ export class ExpenseItem {
     expenseDate: Date;
     value: number;
   }
-  
+
+export interface ExpenseState {
+  readonly expense: Array<ExpenseItem>;
+}  
